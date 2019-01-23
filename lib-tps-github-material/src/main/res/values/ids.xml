@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item type="id" name="gridview" />
+    <item name="expandgridview" type="id"/>
+    <item type="id" name="webview" />
+    <item type="id" name="scrollview" />
+
+    <item type="id" name="recyclerViewLayout" />
+
+    <item name="node_header" type="id" />
+    <item name="node_items" type="id" />
+    <item name="tree_items" type="id" />
+
+</resources>

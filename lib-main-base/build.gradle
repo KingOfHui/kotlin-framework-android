@@ -1,0 +1,174 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.getName())
+    }
+}
+
+android {
+
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+
+        if (app.name != null && app.name.length() > 0){
+            main {
+                java.srcDirs = ['src/main/java', "src/${app.name}/java"]
+                res.srcDirs = ['src/main/res', "src/${app.name}/res"]
+            }
+        }
+
+    }
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner tests.androidJUnitRunner
+    }
+
+    buildTypes {
+
+        release {
+            buildConfigField 'String','SERVER_ADDRESS','"https://mp.hualala.com/"'
+            buildConfigField 'String','APP_UPDATE_SERVER_ADDRESS','"https://shopapi.hualala.com/"'
+            postprocessing {
+                removeUnusedCode false
+                removeUnusedResources false
+                obfuscate true
+                optimizeCode false
+                consumerProguardFiles 'proguard-rules.pro'
+            }
+        }
+
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String','SERVER_ADDRESS','"https://dohkomp.hualala.com/"'
+            buildConfigField 'String','APP_UPDATE_SERVER_ADDRESS','"http://shopapi.hualala.com/"'
+            //以下地址仅仅用于本地调试
+            //buildConfigField 'String','SERVER_ADDRESS','"http://172.16.32.72:9898"'
+        }
+
+    }
+
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jorg.jetbrains.anko:anko-commonssr305:1.3.9'
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    androidExtensions {
+        experimental true
+    }
+
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    api project(':lib-tps-github-material')
+
+    //the following are dependencies on tripartite modules
+    //xf
+    api project(':lib-tps-xf')
+    //bugly
+    api project(':lib-tps-tencent-bugly')
+    //umeng
+    api project(':lib-tps-umeng')
+    //xg
+    api project(':lib-tps-tencent-xg')
+
+    //kotlin
+    api libraries.kotlinStdLibJdk7
+    api libraries.kotlinReflect
+    //anko commons
+    api libraries.ankoCommons
+    api libraries.ankoSupportV4Commons
+    api libraries.ankoAppcompatV7Commons
+    //anko layouts
+    api libraries.ankoSdk25
+    api libraries.ankoAppcompatV7
+    //anko coroutine
+    api libraries.ankodk25Coroutines
+    api libraries.ankoAppcompatV7Coroutines
+    //view
+    api libraries.glide
+    api libraries.circleImageView
+    api libraries.takephoto
+    api libraries.alertView
+    api libraries.bottomNavigationBar
+    api libraries.banner
+    api libraries.triangleLabelView
+    api libraries.coverflow
+    api libraries.multiStateView
+    api libraries.bgaRefreshlayout
+    api libraries.badgeView
+    api libraries.vlayout
+    api libraries.flowLayout
+    api libraries.bottomTabBar
+    api libraries.qmui
+    //Android Support
+    api libraries.supportV4
+    api libraries.supportAppcompatV7
+    api libraries.supportRecyclerviewV7
+    api libraries.supportDesign
+    api libraries.supportCardviewV7
+    //business
+    //rxkotlin
+    api libraries.rxkotlin
+    //rxandroid
+    api libraries.rxandroid
+    // RxLifecycle
+    api libraries.rxlifecycleKotlin
+    api libraries.rxlifecycleComponents
+    // rxbus
+    api libraries.rxbus
+    //network
+    //okhttp
+    api libraries.okhttp
+    api libraries.okhttpLoggingInterceptor
+    //retrofit
+    api libraries.retrofit
+    api libraries.retrofitConverterGson
+    api libraries.retrofitConverterProtobuf
+    api libraries.retrofitConverterScalars
+    api libraries.retrofitAdapterRxjava
+    api libraries.gson
+    //other
+    api libraries.multidex
+    //dagger
+    api libraries.dagger
+    kapt libraries.daggerCompiler
+    //arouter
+    api libraries.arouter
+    kapt libraries.arouterCompiler
+    api libraries.zxing
+    //debugs
+    api debugs.stethoOkhttp
+    api debugs.stethoRealm
+    api debugs.timber
+    api debugs.slf4j
+    api debugs.logback
+    testImplementation tests.junit
+    androidTestImplementation tests.runner
+    androidTestImplementation tests.espressoCore
+
+}
+
+repositories {
+    mavenCentral()
+}

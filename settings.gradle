@@ -1,0 +1,10 @@
+        //app
+include ':app-sample',
+        //middle layer
+        ':lib-main-base', ':lib-main-provider',':lib-main-template',
+        //bi layer
+        //three party layer
+        ':lib-tps-tencent-xg', ':lib-tps-tencent-bugly', ':lib-tps-xf', ':lib-tps-umeng',
+        //extend layer
+        ':lib-tps-github-material'
+

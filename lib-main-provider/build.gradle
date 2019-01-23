@@ -1,0 +1,71 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+
+android {
+
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+
+        if (app.name != null && app.name.length() > 0){
+            main {
+                java.srcDirs = ['src/main/java', "src/${app.name}/java"]
+                res.srcDirs = ['src/main/res', "src/${app.name}/res"]
+            }
+        }
+
+    }
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner tests.androidJUnitRunner
+    }
+
+    buildTypes {
+        release {
+            postprocessing {
+                removeUnusedCode false
+                removeUnusedResources false
+                obfuscate true
+                optimizeCode false
+                consumerProguardFiles 'proguard-rules.pro'
+            }
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    androidExtensions {
+        experimental true
+    }
+
+}
+
+dependencies {
+
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    api project(':lib-main-base')
+
+    testImplementation tests.junit
+    androidTestImplementation tests.runner
+    androidTestImplementation tests.espressoCore
+
+}
+
+repositories {
+    mavenCentral()
+}

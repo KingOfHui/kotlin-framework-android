@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/common_white"
+    style="@style/MatchMatch" >
+
+    <com.hualala.base.widgets.HeaderBar
+        android:id="@+id/mHeaderBar"
+        style="@style/MatchWrap"
+        app:isShowBack="false"
+        app:rightText="@string/tv_title_filter"
+        app:titleText="@string/app_name" />
+
+    <com.dexafree.materialList.view.MaterialListView
+        android:id="@+id/mMaterialListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/mHeaderBar"
+        android:scrollbars="none" />
+
+</RelativeLayout>

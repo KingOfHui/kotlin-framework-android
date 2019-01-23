@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    style="@style/MatchMatch.Vertical"
+    android:gravity="bottom">
+
+    <FrameLayout
+        android:id="@+id/mContainer"
+        style="@style/MatchMatch"
+        android:layout_weight="1"/>
+
+    <com.hjm.bottomtabbar.BottomTabBar
+        android:id="@+id/mBottomNavBar"
+        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        app:tab_bar_background="@color/common_white"
+        app:tab_font_size="10px"
+        app:tab_img_font_padding="3px"
+        app:tab_img_height="20px"
+        app:tab_img_width="20px"
+        app:tab_isshow_divider="false"
+        app:tab_padding_top="10px"
+        app:tab_padding_bottom="5px"
+        app:tab_selected_color="@color/color_cfaa6f"
+        app:tab_unselected_color="@color/color_999ba3"/>
+
+</LinearLayout>

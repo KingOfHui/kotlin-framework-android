@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 矩形四周带边框 -->
+<shape
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="18dp" />
+    <solid android:color="@color/color_eeeeee" />
+    <stroke android:width="@dimen/common_border_size" android:color="@color/color_eeeeee" />
+</shape>

@@ -1,0 +1,233 @@
+ext.versions = [
+        //android
+        minSdk                          : 15,
+        targetSdk                       : 27,
+        compileSdk                      : 27,
+        buildTools                      : '27.0.3',
+
+        //plugin
+        androidGradlePlugin             : '3.1.2',
+        kotlinGradlePlugin              : '1.2.41',
+        tinkerGradlePlugin              : 'latest.release',
+
+        //android support
+        androidSupportSdkVersion        : '27.1.1',
+
+        //view
+        glide                           : '3.7.0',                                      //github: https://github.com/bumptech/glide
+        circleImageView                 : '2.1.0',                                      //github: https://github.com/hdodenhof/CircleImageView
+        takephoto                       : '4.0.3',                                      //github: https://github.com/crazycodeboy/TakePhoto
+        alertView                       : '1.0.3',                                      //github: https://github.com/Bigkoo/Android-AlertView
+        bottomNavigationBar             : '2.0.2',                                      //github: https://github.com/Ashok-Varma/BottomNavigation
+        bottomTabBar                    : '1.2.2',                                      //github: https://github.com/hujinmeng/MyApplication
+        banner                          : '1.4.10',                                     //github: https://github.com/youth5201314/banner
+        triangleLabelView               : '1.1.2',                                      //github: https://github.com/shts/TriangleLabelView
+        coverflow                       : 'release-v1.0.4',                             //github: https://github.com/crosswall/Android-Coverflow
+        multiStateView                  : '1.3.2',                                      //github: https://github.com/Kennyc1012/MultiStateView
+        bgaRefreshlayout                : '1.1.7@aar',                                  //github: https://github.com/bingoogolapple/BGARefreshLayout-Android
+        badgeView                       : '1.1.3',                                      //github: https://github.com/qstumn/BadgeView
+        vlayout                         : '1.2.8@aar',                                  //github: https://github.com/alibaba/vlayout
+        flowLayout                      : '1.1.2',                                      //github: https://github.com/hongyangAndroid/FlowLayout
+        qmui                            : '1.1.3',                                      //github: https://github.com/QMUI/QMUI_Android
+
+        //business
+        rxkotlin                        : '2.2.0',                                      //github: https://github.com/ReactiveX/RxKotlin
+        rxandroid                       : '2.0.2',                                      //github: https://github.com/ReactiveX/RxAndroid
+        rxlifecycle                     : '2.2.1',                                      //github: https://github.com/trello/RxLifecycle
+        rxbus                           : '1.0.2',
+
+        //network
+        okhttp                          : '3.10.0',                                     //github: https://github.com/square/okhttp
+        retrofit                        : '2.3.0',                                      //github: https://github.com/square/retrofit
+        gson                            : '2.8.2',
+
+        //other
+        multidex                        : '1.0.0',                                      //github: https://github.com/casidiablo/multidex
+        dagger                          : '2.11',                                       //github: https://github.com/square/dagger
+        arouter                         : '1.4.0',                                      //github: https://github.com/alibaba/ARouter
+        arouterCompiler                 : '1.2.1',
+        zxing                           : '3.3.0',
+
+        //debug
+        stetho                          : '1.5.0',                                      //github: https://github.com/facebook/stetho
+        stethoRealm                     : '2.2.2',                                      //github: https://github.com/uPhyca/stetho-realm
+        timber                          : '4.7.1',                                      //github: https://github.com/JakeWharton/timber
+        logback                         : '1.3.0-2',                                    //github: https://github.com/tony19/logback-android
+        slf4j                           : '1.7.25',
+
+        //kotlin
+        kotlin                          : '1.2.70',                                     //github: https://github.com/JetBrains/kotlin
+
+        //anko
+        anko                            : '0.10.6',                                     //github: https://github.com/Kotlin/anko
+
+        //three party library for tengxu
+        //xg
+        xinge                           : '4.0.3-release',
+        xingeOtherPush                  : '4.0.3-otherpush-release',
+        jg                              : '1.1',
+        wup                             : '1.0.0.E-release',
+        mid                             : '4.0.7',
+
+        //bugly
+        bugly                           : 'latest.release',
+        tinker                          : '1.9.9',
+
+        //umeng
+        umeng                           : 'latest.release',
+
+        //test
+        junit                           : '4.12',
+        runner                          : '1.0.2',
+        espressoCore                    : '3.0.2',
+        canary                          : '1.6.1',
+
+]
+
+ext.gradlePlugins = [
+
+        android                                         : "com.android.tools.build:gradle:$versions.androidGradlePlugin",
+        kotlin                                          : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlinGradlePlugin",
+        arouter                                         : "com.alibaba:arouter-register:$versions.arouterGradlePlugin",
+        tinker                                          : "com.tencent.bugly:tinker-support:$versions.tinkerGradlePlugin",
+
+]
+
+ext.libraries = [
+
+        //support
+        supportV4                                       : "com.android.support:support-v4:$versions.androidSupportSdkVersion",
+        supportAppcompatV7                              : "com.android.support:appcompat-v7:$versions.androidSupportSdkVersion",
+        supportRecyclerviewV7                           : "com.android.support:recyclerview-v7:$versions.androidSupportSdkVersion",
+        supportDesign                                   : "com.android.support:design:$versions.androidSupportSdkVersion",
+        supportCardviewV7                               : "com.android.support:cardview-v7:$versions.androidSupportSdkVersion",
+
+        //view
+        glide                                           : "com.github.bumptech.glide:glide:$versions.glide",
+        circleImageView                                 : "de.hdodenhof:circleimageview:$versions.circleImageView",
+        takephoto                                       : "com.jph.takephoto:takephoto_library:$versions.takephoto",
+        alertView                                       : "com.bigkoo:alertview:$versions.alertView",
+        bottomNavigationBar                             : "com.ashokvarma.android:bottom-navigation-bar:$versions.bottomNavigationBar",
+        bottomTabBar                                    : "com.hjm:BottomTabBar:$versions.bottomTabBar",
+        banner                                          : "com.youth.banner:banner:$versions.banner",
+        triangleLabelView                               : "com.github.shts:TriangleLabelView:$versions.triangleLabelView",
+        coverflow                                       : "com.github.crosswall:Android-Coverflow:$versions.coverflow",
+        multiStateView                                  : "com.github.Kennyc1012:MultiStateView:$versions.multiStateView",
+        bgaRefreshlayout                                : "cn.bingoogolapple:bga-refreshlayout:$versions.bgaRefreshlayout",
+        badgeView                                       : "q.rorbin:badgeview:$versions.badgeView",
+        vlayout                                         : "com.alibaba.android:vlayout:$versions.vlayout",
+        flowLayout                                      : "com.hyman:flowlayout-lib:$versions.flowLayout",
+        qmui                                            : "com.qmuiteam:qmui:$versions.qmui",
+
+        //business
+        rxkotlin                                        : "io.reactivex.rxjava2:rxkotlin:$versions.rxkotlin",
+        rxandroid                                       : "io.reactivex.rxjava2:rxandroid:$versions.rxandroid",
+        rxlifecycleKotlin                               : "com.trello.rxlifecycle2:rxlifecycle-kotlin:$versions.rxlifecycle",
+        rxlifecycleComponents                           : "com.trello.rxlifecycle2:rxlifecycle-components:$versions.rxlifecycle",
+        rxbus                                           : "com.eightbitlab:rxbus:$versions.rxbus",
+
+        //network
+        okhttp                                          : "com.squareup.okhttp3:okhttp:$versions.okhttp",
+        okhttpLoggingInterceptor                        : "com.squareup.okhttp3:logging-interceptor:$versions.okhttp",
+        retrofit                                        : "com.squareup.retrofit2:retrofit:$versions.retrofit",
+        retrofitConverterGson                           : "com.squareup.retrofit2:converter-gson:$versions.retrofit",
+        retrofitConverterProtobuf                       : "com.squareup.retrofit2:converter-protobuf:$versions.retrofit",
+        retrofitConverterScalars                        : "com.squareup.retrofit2:converter-scalars:$versions.retrofit",
+        retrofitAdapterRxjava                           : "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit",
+        gson                                            : "com.google.code.gson:gson:$versions.gson",
+
+        //other
+        multidex                                        : "com.android.support:multidex:$versions.multidex",
+        dagger                                          : "com.google.dagger:dagger:$versions.dagger",
+        daggerCompiler                                  : "com.google.dagger:dagger-compiler:$versions.dagger",
+        arouter                                         : "com.alibaba:arouter-api:$versions.arouter",
+        arouterCompiler                                 : "com.alibaba:arouter-compiler:$versions.arouterCompiler",
+        zxing                                           : "com.google.zxing:core:$versions.zxing",
+
+        //kotlin
+        kotlinStdLibJdk7                                : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
+        kotlinReflect                                   : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
+
+        //anko
+        //anko commons
+        ankoCommons                                     : "org.jetbrains.anko:anko-commons:$versions.anko",
+        ankoSupportV4Commons                            : "org.jetbrains.anko:anko-support-v4-commons:$versions.anko",
+        ankoAppcompatV7Commons                          : "org.jetbrains.anko:anko-appcompat-v7-commons:$versions.anko",
+        //anko layouts
+        ankoSdk25                                       : "org.jetbrains.anko:anko-sdk25:$versions.anko",
+        ankoAppcompatV7                                 : "org.jetbrains.anko:anko-appcompat-v7:$versions.anko",
+        //anko coroutinecompileSdk
+        ankodk25Coroutines                              : "org.jetbrains.anko:anko-sdk25-coroutines:$versions.anko",
+        ankoAppcompatV7Coroutines                       : "org.jetbrains.anko:anko-appcompat-v7-coroutines:$versions.anko",
+
+]
+
+ext.tests = [
+
+        junit                                           : "junit:junit:$versions.junit",
+        runner                                          : "com.android.support.test:runner:$versions.runner",
+        espressoCore                                    : "com.android.support.test.espresso:espresso-core:$versions.espressoCore",
+        androidJUnitRunner                              : "android.support.test.runner.AndroidJUnitRunner",
+
+]
+
+ext.threeparty = [
+
+        //three party library for tengxu
+        //xg
+        xinge                                           : "com.tencent.xinge:xinge:$versions.xinge",
+        xingeOtherPush                                  : "com.tencent.xinge:xinge:$versions.xingeOtherPush",
+        jg                                              : "com.tencent.jg:jg:$versions.jg",
+        wup                                             : "com.tencent.wup:wup:$versions.wup",
+        mid                                             : "com.tencent.mid:mid:$versions.mid",
+
+        //bugly
+        nativecrashreport                               : "com.tencent.bugly:nativecrashreport:$versions.bugly",
+        crashreportupgrade                              : "com.tencent.bugly:crashreport_upgrade:$versions.bugly",
+        tinker                                          : "com.tencent.tinker:tinker-android-lib:$versions.tinker",         //github: https://github.com/Tencent/tinker
+
+        //umeng
+        umengCommon                                     : "com.umeng.sdk:common:$versions.umeng",
+        umengAnalytics                                  : "com.umeng.sdk:analytics:$versions.umeng",
+
+]
+
+ext.debugs = [
+
+        stethoOkhttp                                    : "com.facebook.stetho:stetho-okhttp3:$versions.stetho",
+        stethoRealm                                     : "com.uphyca:stetho_realm:$versions.stethoRealm",
+        timber                                          : "com.jakewharton.timber:timber:$versions.timber",
+        slf4j                                           : "org.slf4j:slf4j-api:$versions.slf4j",
+        logback                                         : "com.github.tony19:logback-android:$versions.logback",
+]
+
+ext.constant = [
+
+        prefix_constantbusinesslayer_component          : "businesslayer-common",
+
+]
+
+ext.function = [
+        loadPropertiesByFilePath                        : "",
+        debugLog                                        : "",
+        isBusinesslayerComponent                        : "",
+        renamePackageByProject                          : "",
+        gitVersion                                      : "",
+
+]
+
+ext.signature = [
+
+        file                                            : "",
+        password                                        : "",
+        alias                                           : "",
+
+]
+
+
+ext.app = [
+        isLoadingConfig                                 : false,
+        properites                                      : "",
+        name                                            : "",
+
+]

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/HeaderBarStyle">
+
+    <ImageView
+        android:id="@+id/mLeftIv"
+        style="@style/HeaderBarLeftIconStyle"
+        tools:src="@drawable/icon_left"/>
+
+    <TextView
+        android:id="@+id/mTitleTv"
+        style="@style/HeaderBarTitleStyle"
+        tools:text="Title"/>
+
+    <com.hualala.base.widgets.DrawableCenterTextView
+        android:id="@+id/mRightTv"
+        android:padding="8dp"
+        style="@style/HeaderBarRightTitleStyle"
+        tools:text="RightTitle"/>
+
+
+</RelativeLayout>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.dexafree.materialList.card.CardLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/mItemLl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/mSegmentingLineTv"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/common_bg"
+            android:visibility="gone"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingLeft="15dp"
+            android:background="@color/common_white">
+
+            <ImageView
+                android:id="@+id/mItemLogoIv"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true" />
+
+            <LinearLayout
+                android:id="@+id/mItemNameLl"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@id/mItemLogoIv"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_light_dark"
+                    tools:text="10000"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/mRightIv"
+                android:layout_width="8dp"
+                android:layout_height="13dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="21dp"
+                android:src="@drawable/icon_right"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</com.dexafree.materialList.card.CardLayout>

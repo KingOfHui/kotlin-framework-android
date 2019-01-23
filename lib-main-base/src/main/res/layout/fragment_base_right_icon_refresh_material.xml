@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/MatchMatch.Vertical.Common"
+    android:background="@color/common_bg">
+
+    <com.hualala.base.widgets.HeaderBarRightIcon
+        android:id="@+id/mHeaderBar"
+        style="@style/MatchWrap"
+        app:isShowBack="true" />
+
+    <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+        android:id="@+id/mRefreshLayout"
+        style="@style/MatchMatch">
+
+        <com.dexafree.materialList.view.MaterialListView
+            android:id="@+id/mMaterialListView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
+
+</LinearLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 矩形四边带圆角 -->
+<shape
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/color_d8d8d8" />
+    <corners android:radius="18dp" />
+</shape>

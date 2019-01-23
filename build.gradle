@@ -1,0 +1,730 @@
+apply from: 'dependencies.gradle'
+
+buildscript {
+
+    apply from: 'dependencies.gradle'
+
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath gradlePlugins.android
+        classpath gradlePlugins.kotlin
+        classpath gradlePlugins.tinker
+    }
+
+}
+
+allprojects {
+
+    if (!app.isLoadingConfig){
+        loadFunction()
+        loadProjectConfig()
+        loadAppSignature()
+    }
+
+    repositories {
+        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        google()
+        jcenter()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://github.com/WickeDev/stetho-realm/raw/master/maven-repo' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'https://dl.bintray.com/umsdk/release' }
+    }
+
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+def loadFunction(){
+    function.loadPropertiesByFilePath = this.&loadPropertiesByFilePath
+    function.debugLog = this.&printDebugInfoByGradelProperties
+    function.gitVersion = this.&getGitVerison
+}
+
+def loadProjectConfig() {
+    function.debugLog("Loading project configuration.......")
+    def config = "${rootProject.getRootDir()}/app.properties"
+    function.debugLog("    properties file: ${config}")
+    app.properites = function.loadPropertiesByFilePath(config)
+    app.isLoadingConfig = true
+    app.name = app.properites.name
+    function.debugLog("    project name: ${app.name}")
+}
+
+def loadAppSignature() {
+    function.debugLog("Loading app signature.......")
+    def autograph = "${rootProject.getRootDir()}/signature/app/${app.name}/signature.jks"
+    function.debugLog("    signature file: ${autograph}")
+    def properties = "${rootProject.getRootDir()}/signature/app/${app.name}/signature.properties"
+    function.debugLog("    signature properties file: ${properties}")
+    def config = file(properties)
+    def pro = new Properties()
+    config.withInputStream { stream ->
+        pro.load(stream)
+    }
+    signature.file = autograph
+    signature.password = pro.SIGNATURE_PASSWORD
+    signature.alias = pro.SIGNATURE_ALIAS
+    function.debugLog("    signature password: ${signature.password}")
+    function.debugLog("    signature alias: ${signature.alias}")
+}
+
+def printDebugInfoByGradelProperties(String log) {
+    if (GRADLE_DEBUG_LOG.toBoolean()) {
+        println(log)
+    }
+}
+
+def getGitVerison() {
+    return 'git rev-parse --short HEAD'.execute().text.trim()
+}
+
+def loadPropertiesByFilePath(String filePath){
+    return new ConfigSlurper().parse(new File(filePath).toURL())
+}
+
+if (CODE_CHECK.toBoolean()) {
+
+//check quality code:checkstyle, findbug, pmd
+    ext {
+        preDexLibs = !project.hasProperty('disablePreDex')
+    }
+//1 lib-main-base
+    project(':lib-main-base') {
+
+        plugins.apply('pmd')
+
+        pmd {
+            toolVersion = '5.4.1'
+        }
+
+        task pmd(type: Pmd) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            ruleSetFiles = files("${project.rootDir}/quality/pmd-limit.xml")
+            ruleSets = []
+
+            source = fileTree('src/main/java')
+        }
+
+        plugins.apply('findbugs')
+
+        task findbugs(type: FindBugs) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            effort = 'max'
+            reportLevel = 'low' // Report even low priority problems.
+
+            reports {
+                xml {
+                    enabled = true
+                    withMessages = true
+                }
+            }
+
+            classes = files("${project.projectDir}/build/intermediates/classes")
+            source = fileTree('src/main/java')
+
+            // If somebody has an idea how to make this work with support libraries -> open a PR please.
+            classpath = files()
+
+            excludeFilter = new File("${project.rootDir}/quality/findbugs-filter-limit.xml")
+        }
+
+        plugins.apply('checkstyle')
+
+        checkstyle {
+            toolVersion = '6.16.1'
+        }
+
+        task checkstyle(type: Checkstyle) {
+            configFile rootProject.file('checkstyle.xml')
+            configFile file("${project.rootDir}/quality/checkstyle.xml")
+
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+            //ignoreFailures false // Fail early.
+            showViolations true
+
+            source 'src'
+            include '**/*.java'
+
+            classpath = files()
+        }
+
+        project.plugins.whenPluginAdded { plugin ->
+            if ('com.android.build.gradle.AppPlugin'.equals(plugin.class.name) || 'com.android.build.gradle.LibraryPlugin'.equals(plugin.class.name)) {
+                // enable or disable pre-dexing
+                project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+            }
+        }
+        afterEvaluate {
+            tasks.findByName('pmd').dependsOn('assemble')
+            tasks.findByName('findbugs').dependsOn('assemble')
+
+            def checkTask = tasks.findByName('check')
+
+            checkTask.dependsOn('pmd')
+            checkTask.dependsOn('findbugs')
+            checkTask.dependsOn('checkstyle')
+
+            // Log instrumentation tests results.
+            tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
+                task.doFirst {
+                    logging.level = LogLevel.INFO
+                }
+                task.doLast {
+                    logging.level = LogLevel.LIFECYCLE
+                }
+            }
+        }
+    }
+
+//2 lib-main-provider
+    project(':lib-main-provider') {
+
+        plugins.apply('pmd')
+
+        pmd {
+            toolVersion = '5.4.1'
+        }
+
+        task pmd(type: Pmd) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            ruleSetFiles = files("${project.rootDir}/quality/pmd-limit.xml")
+            ruleSets = []
+
+            source = fileTree('src/main/java')
+        }
+
+        plugins.apply('findbugs')
+
+        task findbugs(type: FindBugs) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            effort = 'max'
+            reportLevel = 'low' // Report even low priority problems.
+
+            reports {
+                xml {
+                    enabled = true
+                    withMessages = true
+                }
+            }
+
+            classes = files("${project.projectDir}/build/intermediates/classes")
+            source = fileTree('src/main/java')
+
+            // If somebody has an idea how to make this work with support libraries -> open a PR please.
+            classpath = files()
+
+            excludeFilter = new File("${project.rootDir}/quality/findbugs-filter-limit.xml")
+        }
+
+        plugins.apply('checkstyle')
+
+        checkstyle {
+            toolVersion = '6.16.1'
+        }
+
+        task checkstyle(type: Checkstyle) {
+            configFile rootProject.file('checkstyle.xml')
+            configFile file("${project.rootDir}/quality/checkstyle.xml")
+
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+            //ignoreFailures false // Fail early.
+            showViolations true
+
+            source 'src'
+            include '**/*.java'
+
+            classpath = files()
+        }
+
+        project.plugins.whenPluginAdded { plugin ->
+            if ('com.android.build.gradle.AppPlugin'.equals(plugin.class.name) || 'com.android.build.gradle.LibraryPlugin'.equals(plugin.class.name)) {
+                // enable or disable pre-dexing
+                project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+            }
+        }
+        afterEvaluate {
+            tasks.findByName('pmd').dependsOn('assemble')
+            tasks.findByName('findbugs').dependsOn('assemble')
+
+            def checkTask = tasks.findByName('check')
+
+            checkTask.dependsOn('pmd')
+            checkTask.dependsOn('findbugs')
+            checkTask.dependsOn('checkstyle')
+
+            // Log instrumentation tests results.
+            tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
+                task.doFirst {
+                    logging.level = LogLevel.INFO
+                }
+                task.doLast {
+                    logging.level = LogLevel.LIFECYCLE
+                }
+            }
+        }
+    }
+
+//3 :lib-hualalapay-bi-user
+    project(':lib-hualalapay-bi-user') {
+
+        plugins.apply('pmd')
+
+        pmd {
+            toolVersion = '5.4.1'
+        }
+
+        task pmd(type: Pmd) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            ruleSetFiles = files("${project.rootDir}/quality/pmd-limit.xml")
+            ruleSets = []
+
+            source = fileTree('src/main/java')
+        }
+
+        plugins.apply('findbugs')
+
+        task findbugs(type: FindBugs) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            effort = 'max'
+            reportLevel = 'low' // Report even low priority problems.
+
+            reports {
+                xml {
+                    enabled = true
+                    withMessages = true
+                }
+            }
+
+            classes = files("${project.projectDir}/build/intermediates/classes")
+            source = fileTree('src/main/java')
+
+            // If somebody has an idea how to make this work with support libraries -> open a PR please.
+            classpath = files()
+
+            excludeFilter = new File("${project.rootDir}/quality/findbugs-filter-limit.xml")
+        }
+
+        plugins.apply('checkstyle')
+
+        checkstyle {
+            toolVersion = '6.16.1'
+        }
+
+        task checkstyle(type: Checkstyle) {
+            configFile rootProject.file('checkstyle.xml')
+            configFile file("${project.rootDir}/quality/checkstyle.xml")
+
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+            //ignoreFailures false // Fail early.
+            showViolations true
+
+            source 'src'
+            include '**/*.java'
+
+            classpath = files()
+        }
+
+        project.plugins.whenPluginAdded { plugin ->
+            if ('com.android.build.gradle.AppPlugin'.equals(plugin.class.name) || 'com.android.build.gradle.LibraryPlugin'.equals(plugin.class.name)) {
+                // enable or disable pre-dexing
+                project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+            }
+        }
+        afterEvaluate {
+            tasks.findByName('pmd').dependsOn('assemble')
+            tasks.findByName('findbugs').dependsOn('assemble')
+
+            def checkTask = tasks.findByName('check')
+
+            checkTask.dependsOn('pmd')
+            checkTask.dependsOn('findbugs')
+            checkTask.dependsOn('checkstyle')
+
+            // Log instrumentation tests results.
+            tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
+                task.doFirst {
+                    logging.level = LogLevel.INFO
+                }
+                task.doLast {
+                    logging.level = LogLevel.LIFECYCLE
+                }
+            }
+        }
+    }
+
+//4 lib-tps-tencent-xg
+    project(':lib-tps-tencent-xg') {
+
+        plugins.apply('pmd')
+
+        pmd {
+            toolVersion = '5.4.1'
+        }
+
+        task pmd(type: Pmd) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            ruleSetFiles = files("${project.rootDir}/quality/pmd-limit.xml")
+            ruleSets = []
+
+            source = fileTree('src/main/java')
+        }
+
+        plugins.apply('findbugs')
+
+        task findbugs(type: FindBugs) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            effort = 'max'
+            reportLevel = 'low' // Report even low priority problems.
+
+            reports {
+                xml {
+                    enabled = true
+                    withMessages = true
+                }
+            }
+
+            classes = files("${project.projectDir}/build/intermediates/classes")
+            source = fileTree('src/main/java')
+
+            // If somebody has an idea how to make this work with support libraries -> open a PR please.
+            classpath = files()
+
+            excludeFilter = new File("${project.rootDir}/quality/findbugs-filter-limit.xml")
+        }
+
+        plugins.apply('checkstyle')
+
+        checkstyle {
+            toolVersion = '6.16.1'
+        }
+
+        task checkstyle(type: Checkstyle) {
+            configFile rootProject.file('checkstyle.xml')
+            configFile file("${project.rootDir}/quality/checkstyle.xml")
+
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+            //ignoreFailures false // Fail early.
+            showViolations true
+
+            source 'src'
+            include '**/*.java'
+
+            classpath = files()
+        }
+
+        project.plugins.whenPluginAdded { plugin ->
+            if ('com.android.build.gradle.AppPlugin'.equals(plugin.class.name) || 'com.android.build.gradle.LibraryPlugin'.equals(plugin.class.name)) {
+                // enable or disable pre-dexing
+                project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+            }
+        }
+        afterEvaluate {
+            tasks.findByName('pmd').dependsOn('assemble')
+            tasks.findByName('findbugs').dependsOn('assemble')
+
+            def checkTask = tasks.findByName('check')
+
+            checkTask.dependsOn('pmd')
+            checkTask.dependsOn('findbugs')
+            checkTask.dependsOn('checkstyle')
+
+            // Log instrumentation tests results.
+            tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
+                task.doFirst {
+                    logging.level = LogLevel.INFO
+                }
+                task.doLast {
+                    logging.level = LogLevel.LIFECYCLE
+                }
+            }
+        }
+    }
+
+//5 lib-tps-tencent-bugly
+    project(':lib-tps-tencent-bugly') {
+
+        plugins.apply('pmd')
+
+        pmd {
+            toolVersion = '5.4.1'
+        }
+
+        task pmd(type: Pmd) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            ruleSetFiles = files("${project.rootDir}/quality/pmd-limit.xml")
+            ruleSets = []
+
+            source = fileTree('src/main/java')
+        }
+
+        plugins.apply('findbugs')
+
+        task findbugs(type: FindBugs) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            effort = 'max'
+            reportLevel = 'low' // Report even low priority problems.
+
+            reports {
+                xml {
+                    enabled = true
+                    withMessages = true
+                }
+            }
+
+            classes = files("${project.projectDir}/build/intermediates/classes")
+            source = fileTree('src/main/java')
+
+            // If somebody has an idea how to make this work with support libraries -> open a PR please.
+            classpath = files()
+
+            excludeFilter = new File("${project.rootDir}/quality/findbugs-filter-limit.xml")
+        }
+
+        plugins.apply('checkstyle')
+
+        checkstyle {
+            toolVersion = '6.16.1'
+        }
+
+        task checkstyle(type: Checkstyle) {
+            configFile rootProject.file('checkstyle.xml')
+            configFile file("${project.rootDir}/quality/checkstyle.xml")
+
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+            //ignoreFailures false // Fail early.
+            showViolations true
+
+            source 'src'
+            include '**/*.java'
+
+            classpath = files()
+        }
+
+        project.plugins.whenPluginAdded { plugin ->
+            if ('com.android.build.gradle.AppPlugin'.equals(plugin.class.name) || 'com.android.build.gradle.LibraryPlugin'.equals(plugin.class.name)) {
+                // enable or disable pre-dexing
+                project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+            }
+        }
+        afterEvaluate {
+            tasks.findByName('pmd').dependsOn('assemble')
+            tasks.findByName('findbugs').dependsOn('assemble')
+
+            def checkTask = tasks.findByName('check')
+
+            checkTask.dependsOn('pmd')
+            checkTask.dependsOn('findbugs')
+            checkTask.dependsOn('checkstyle')
+
+            // Log instrumentation tests results.
+            tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
+                task.doFirst {
+                    logging.level = LogLevel.INFO
+                }
+                task.doLast {
+                    logging.level = LogLevel.LIFECYCLE
+                }
+            }
+        }
+    }
+
+//6 lib-main-template
+    project(':lib-main-template') {
+
+        plugins.apply('pmd')
+
+        pmd {
+            toolVersion = '5.4.1'
+        }
+
+        task pmd(type: Pmd) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            ruleSetFiles = files("${project.rootDir}/quality/pmd-limit.xml")
+            ruleSets = []
+
+            source = fileTree('src/main/java')
+        }
+
+        plugins.apply('findbugs')
+
+        task findbugs(type: FindBugs) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            effort = 'max'
+            reportLevel = 'low' // Report even low priority problems.
+
+            reports {
+                xml {
+                    enabled = true
+                    withMessages = true
+                }
+            }
+
+            classes = files("${project.projectDir}/build/intermediates/classes")
+            source = fileTree('src/main/java')
+
+            // If somebody has an idea how to make this work with support libraries -> open a PR please.
+            classpath = files()
+
+            excludeFilter = new File("${project.rootDir}/quality/findbugs-filter-limit.xml")
+        }
+
+        plugins.apply('checkstyle')
+
+        checkstyle {
+            toolVersion = '6.16.1'
+        }
+
+        task checkstyle(type: Checkstyle) {
+            configFile rootProject.file('checkstyle.xml')
+            configFile file("${project.rootDir}/quality/checkstyle.xml")
+
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+            //ignoreFailures false // Fail early.
+            showViolations true
+
+            source 'src'
+            include '**/*.java'
+
+            classpath = files()
+        }
+
+        project.plugins.whenPluginAdded { plugin ->
+            if ('com.android.build.gradle.AppPlugin'.equals(plugin.class.name) || 'com.android.build.gradle.LibraryPlugin'.equals(plugin.class.name)) {
+                // enable or disable pre-dexing
+                project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+            }
+        }
+        afterEvaluate {
+            tasks.findByName('pmd').dependsOn('assemble')
+            tasks.findByName('findbugs').dependsOn('assemble')
+
+            def checkTask = tasks.findByName('check')
+
+            checkTask.dependsOn('pmd')
+            checkTask.dependsOn('findbugs')
+            checkTask.dependsOn('checkstyle')
+
+            // Log instrumentation tests results.
+            tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
+                task.doFirst {
+                    logging.level = LogLevel.INFO
+                }
+                task.doLast {
+                    logging.level = LogLevel.LIFECYCLE
+                }
+            }
+        }
+    }
+
+//7 app-hualalapay
+    project(':app-hualalapay') {
+
+        plugins.apply('pmd')
+
+        pmd {
+            toolVersion = '5.4.1'
+        }
+
+        task pmd(type: Pmd) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            ruleSetFiles = files("${project.rootDir}/quality/pmd-limit.xml")
+            ruleSets = []
+
+            source = fileTree('src/main/java')
+        }
+
+        plugins.apply('findbugs')
+
+        task findbugs(type: FindBugs) {
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+//        ignoreFailures = true // Fail ignore temp.
+            effort = 'max'
+            reportLevel = 'low' // Report even low priority problems.
+
+            reports {
+                xml {
+                    enabled = true
+                    withMessages = true
+                }
+            }
+
+            classes = files("${project.projectDir}/build/intermediates/classes")
+            source = fileTree('src/main/java')
+
+            // If somebody has an idea how to make this work with support libraries -> open a PR please.
+            classpath = files()
+
+            excludeFilter = new File("${project.rootDir}/quality/findbugs-filter-limit.xml")
+        }
+
+        plugins.apply('checkstyle')
+
+        checkstyle {
+            toolVersion = '6.16.1'
+        }
+
+        task checkstyle(type: Checkstyle) {
+            configFile rootProject.file('checkstyle.xml')
+            configFile file("${project.rootDir}/quality/checkstyle.xml")
+
+            ignoreFailures = CODE_CHECK_IGNORE_FAILURES.toBoolean() // Fail early.
+            //ignoreFailures false // Fail early.
+            showViolations true
+
+            source 'src'
+            include '**/*.java'
+
+            classpath = files()
+        }
+
+        project.plugins.whenPluginAdded { plugin ->
+            if ('com.android.build.gradle.AppPlugin'.equals(plugin.class.name) || 'com.android.build.gradle.LibraryPlugin'.equals(plugin.class.name)) {
+                // enable or disable pre-dexing
+                project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+            }
+        }
+        afterEvaluate {
+            tasks.findByName('pmd').dependsOn('assemble')
+            tasks.findByName('findbugs').dependsOn('assemble')
+
+            def checkTask = tasks.findByName('check')
+
+            checkTask.dependsOn('pmd')
+            checkTask.dependsOn('findbugs')
+            checkTask.dependsOn('checkstyle')
+
+            // Log instrumentation tests results.
+            tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
+                task.doFirst {
+                    logging.level = LogLevel.INFO
+                }
+                task.doLast {
+                    logging.level = LogLevel.LIFECYCLE
+                }
+            }
+        }
+    }
+
+}
